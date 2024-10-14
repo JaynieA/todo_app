@@ -1,10 +1,31 @@
-<?php 
+<?php
 include "partials/header.php";
-include "partials/notifications.php";
 include "config/Database.php";
+include "partials/notifications.php";
 
-$myDb = new Database;
-$myDb->connect();
+include "classes/Task.php";
+
+$database = new Database;
+$db = $database->connect();
+
+$todo = new Task($db);
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+
+    //detect add_task submitted
+    if (isset($_POST['add_task'])) {
+        $todo->task = htmlspecialchars(trim($_POST['task']));
+        $todo->create();
+    }
+
+    //detect complete_task submitted
+    if (isset($_POST['complete_task'])) {
+        $todo->update($_POST['id']);
+    }
+}
+
+//fetch tasks
+$tasks = $todo->read();
 
 ?>
 
@@ -20,45 +41,34 @@ $myDb->connect();
 
     <!-- Display Tasks -->
     <ul>
-        <li class="completed">
-            <span class="completed">Sample Task</span>
-            <div>
-                <!-- Complete Task -->
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="1">
-                    <button class="complete" type="submit" name="complete_task">Complete</button>
-                </form>
+        <!-- if task is completed, use this structure: -->
+        <?php while ($task = $tasks->fetch_assoc()): ?>
 
-                <!-- Undo Completed Task -->
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="1">
-                    <button class="undo" type="submit" name="undo_complete_task">Undo</button>
-                </form>
+            <li class="completed">
+                <span class="<?php $task['is_completed'] ? 'completed' : '' ?>"><?php echo $task['task']; ?></span>
+                <div>
+                    <!-- Complete Task -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
+                        <button class="complete" type="submit" name="complete_task">Complete</button>
+                    </form>
 
-                <!-- Delete Task -->
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="1">
-                    <button class="delete" type="submit" name="delete_task">Delete</button>
-                </form>
-            </div>
-        </li>
+                    <?php if($task['is_completed']): ?>
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
+                        <button class="undo" type="submit" name="undo_complete_task">Undo</button>
+                    </form>
+                    <?php endif; ?>
 
-        <li>
-            <span>Another Task</span>
-            <div>
-                <!-- Complete Task -->
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="2">
-                    <button class="complete" type="submit" name="complete_task">Complete</button>
-                </form>
+                    <!-- Delete Task -->
+                    <form method="POST" style="display:inline;">
+                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
+                        <button class="delete" type="submit" name="delete_task">Delete</button>
+                    </form>
+                </div>
+            </li>
 
-                <!-- Delete Task -->
-                <form method="POST" style="display:inline;">
-                    <input type="hidden" name="id" value="2">
-                    <button class="delete" type="submit" name="delete_task">Delete</button>
-                </form>
-            </div>
-        </li>
+        <?php endwhile; ?>
     </ul>
 </div>
 
