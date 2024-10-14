@@ -20,7 +20,22 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
     //detect complete_task submitted
     if (isset($_POST['complete_task'])) {
+        $todo->id = $_POST['id'];
+        $todo->is_completed = 1;
         $todo->update($_POST['id']);
+    }
+
+    //detect undo_complete_task submitted
+    if (isset($_POST['undo_complete_task'])) {
+        $todo->id = $_POST['id'];
+        $todo->is_completed = 0;
+        $todo->update($_POST['id']);
+    }
+
+    //detect delete_task submitted
+    if (isset($_POST['delete_task'])) {
+        $todo->id = $_POST['id'];
+        $todo->delete($_POST['id']);
     }
 }
 
@@ -45,29 +60,31 @@ $tasks = $todo->read();
         <?php while ($task = $tasks->fetch_assoc()): ?>
 
             <li class="completed">
-                <span class="<?php $task['is_completed'] ? 'completed' : '' ?>"><?php echo $task['task']; ?></span>
+                <span class="<?php $task['is_completed'] ? 'completed' : '' ?>">
+                    <?php echo $task['task']; ?>
+                </span>
                 <div>
                     <!-- Complete Task -->
                     <form method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
+                        <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
                         <button class="complete" type="submit" name="complete_task">Complete</button>
                     </form>
 
-                    <?php if($task['is_completed']): ?>
-                    <form method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
-                        <button class="undo" type="submit" name="undo_complete_task">Undo</button>
-                    </form>
+                    <?php if ($task['is_completed']): ?>
+                        <!-- Undo Completed Task -->
+                        <form method="POST" style="display:inline;">
+                            <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
+                            <button class="undo" type="submit" name="undo_complete_task">Undo</button>
+                        </form>
                     <?php endif; ?>
 
                     <!-- Delete Task -->
                     <form method="POST" style="display:inline;">
-                        <input type="hidden" name="id" value="<?php $task['id'] ?>">
+                        <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
                         <button class="delete" type="submit" name="delete_task">Delete</button>
                     </form>
                 </div>
             </li>
-
         <?php endwhile; ?>
     </ul>
 </div>

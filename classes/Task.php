@@ -29,5 +29,19 @@ class Task {
         return $result;
     }
 
+    public function update() {
+        $query = "UPDATE {$this->table} SET is_completed = {$this->is_completed} WHERE id=?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $this->id);
+        return $stmt->execute();
+    }
+
+    public function delete($id) {
+        $query = "DELETE FROM {$this->table} WHERE id = ?";
+        $stmt = $this->conn->prepare($query);
+        $stmt->bind_param("i", $this->id);
+        return $stmt->execute();
+    }
+
 
 }
