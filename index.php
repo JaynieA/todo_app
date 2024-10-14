@@ -1,9 +1,11 @@
 <?php
+
 include "partials/header.php";
 include "config/Database.php";
-include "partials/notifications.php";
 
 include "classes/Task.php";
+
+session_start();
 
 $database = new Database;
 $db = $database->connect();
@@ -16,6 +18,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
     if (isset($_POST['add_task'])) {
         $todo->task = htmlspecialchars(trim($_POST['task']));
         $todo->create();
+        $_SESSION['message'] = "Task added successfully";
+        $_SESSION['msg_type'] = "success";
     }
 
     //detect complete_task submitted
@@ -23,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $todo->id = $_POST['id'];
         $todo->is_completed = 1;
         $todo->update($_POST['id']);
+        $_SESSION['message'] = "Task updated";
+        $_SESSION['msg_type'] = "success";
     }
 
     //detect undo_complete_task submitted
@@ -30,12 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
         $todo->id = $_POST['id'];
         $todo->is_completed = 0;
         $todo->update($_POST['id']);
+        $_SESSION['message'] = "Task updated";
+        $_SESSION['msg_type'] = "success";
     }
 
     //detect delete_task submitted
     if (isset($_POST['delete_task'])) {
         $todo->id = $_POST['id'];
         $todo->delete($_POST['id']);
+        $_SESSION['message'] = "Task deleted";
+        $_SESSION['msg_type'] = "success";
     }
 }
 
@@ -43,6 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 $tasks = $todo->read();
 
 ?>
+
+<?php include "partials/notifications.php"; ?>
 
 <!-- Main Content Container -->
 <div class="container">
@@ -60,7 +72,7 @@ $tasks = $todo->read();
         <?php while ($task = $tasks->fetch_assoc()): ?>
 
             <li class="completed">
-                <span class="<?php $task['is_completed'] ? 'completed' : '' ?>">
+                <span class="<?php echo $task['is_completed'] ? 'completed' : '' ?>">
                     <?php echo $task['task']; ?>
                 </span>
                 <div>
