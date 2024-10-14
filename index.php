@@ -1,6 +1,12 @@
-<?php include "partials/header.php"; ?>
+<?php 
+include "partials/header.php";
+include "partials/notifications.php";
+include "config/Database.php";
 
-<?php include "partials/notifications.php" ?>
+$myDb = new Database;
+$myDb->connect();
+
+?>
 
 <!-- Main Content Container -->
 <div class="container">
@@ -22,7 +28,7 @@
                     <input type="hidden" name="id" value="1">
                     <button class="complete" type="submit" name="complete_task">Complete</button>
                 </form>
-                
+
                 <!-- Undo Completed Task -->
                 <form method="POST" style="display:inline;">
                     <input type="hidden" name="id" value="1">
@@ -56,4 +62,4 @@
     </ul>
 </div>
 
-<?php include "partials/footer.php" ?>
+<?php include "partials/footer.php"; ?>
