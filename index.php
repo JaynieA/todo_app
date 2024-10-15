@@ -91,7 +91,7 @@ $tasks = $todo->read();
                     <?php endif; ?>
 
                     <!-- Delete Task -->
-                    <form method="POST" style="display:inline;">
+                    <form method="POST" style="display:inline;" onsubmit="return confirmDelete();">
                         <input type="hidden" name="id" value="<?php echo $task['id'] ?>">
                         <button class="delete" type="submit" name="delete_task">Delete</button>
                     </form>
@@ -100,5 +100,13 @@ $tasks = $todo->read();
         <?php endwhile; ?>
     </ul>
 </div>
+
+<script>
+
+    function confirmDelete() {
+        alert("Are you sure you want to delete?");
+    }
+
+</script>
 
 <?php include "partials/footer.php"; ?>
